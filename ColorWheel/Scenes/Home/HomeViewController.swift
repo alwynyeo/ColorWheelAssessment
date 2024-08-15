@@ -15,6 +15,9 @@ final class HomeViewController: UIViewController {
     private var secondSegmentedControlView: SegmentedControlView!
     private var thirdSegmentedControlView: SegmentedControlView!
     private var segmentedControlStackView: UIStackView!
+
+    private var colorWheelView: ColorWheelView!
+
     private var mainStackView: UIStackView!
 
     // MARK: - State
@@ -68,6 +71,12 @@ final class HomeViewController: UIViewController {
 // MARK: - HomeDisplayLogic Extension
 extension HomeViewController: HomeDisplayLogic {}
 
+extension HomeViewController: ColorWheelDelegate {
+    func colorWheelDidChange(newColor: ColorWheelNewColor) {
+
+    }
+}
+
 extension HomeViewController: SegmentedControlViewDelegate {
     func didTap(type: SegmentedControlViewTypeEnum?) {
         print("tap")
@@ -80,6 +89,8 @@ private extension HomeViewController {
         view.backgroundColor = Color.background
         setupSegmentedControlViews()
         setupSegmentedControlStackView()
+        setupColorWheelView()
+        setupBrightnessSlider()
         setupMainStackView()
     }
 
@@ -119,15 +130,26 @@ private extension HomeViewController {
         NSLayoutConstraint.activate(constraints)
     }
 
+    func setupColorWheelView() {
+        let width = view.frame.width - 32
+        let frame = CGRect(x: 0, y: 0, width: width, height: width)
+
+        colorWheelView = ColorWheelView(frame: frame)
+        colorWheelView.delegate = self
+    }
+
+    func setupBrightnessSlider() {}
+
     func setupMainStackView() {
         mainStackView = UIStackView()
         mainStackView.axis = NSLayoutConstraint.Axis.vertical
         mainStackView.distribution = UIStackView.Distribution.fill
-        mainStackView.spacing = 16.0
+        mainStackView.spacing = 24.0
         mainStackView.alignment = UIStackView.Alignment.fill
         mainStackView.translatesAutoresizingMaskIntoConstraints = false
 
         mainStackView.addArrangedSubview(segmentedControlStackView)
+        mainStackView.addArrangedSubview(colorWheelView)
 
         view.addSubview(mainStackView)
 
@@ -135,7 +157,7 @@ private extension HomeViewController {
             mainStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
             mainStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
             mainStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            mainStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            mainStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
         ]
 
         NSLayoutConstraint.activate(constraints)
