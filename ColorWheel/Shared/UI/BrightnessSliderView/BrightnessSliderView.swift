@@ -34,13 +34,25 @@ final class BrightnessSliderView: UIView {
         setupUI()
     }
 
+    // MARK: - Helpers
+
+    func updateSliderValue(value: CGFloat) {
+        let _value = Float(value)
+        slider.value = _value
+        updateTitleLabel(value: _value)
+    }
+
     // MARK: - Private Helpers
 
-    @objc private func handleSlider(_ sender: UISlider) {
-        let value = sender.value
+    private func updateTitleLabel(value: Float) {
         let formattedValue = Int(value * 100)
         let titleString = "Brightness: \(formattedValue)%"
         titleLabel.text = titleString
+    }
+
+    @objc private func handleSlider(_ sender: UISlider) {
+        let value = sender.value
+        updateTitleLabel(value: value)
         delegate?.sliderDidChange(value)
     }
 }
