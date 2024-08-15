@@ -21,5 +21,5 @@ protocol HomeDisplayLogic: AnyObject {
     func updateSecondSegmentedControlViewCircularColor(with color: UIColor)
     func updateThirdSegmentedControlViewCircularColor(with color: UIColor)
     func updateColorWheel(brightness: CGFloat)
-    func updateColorWheel(color: UIColor)
+    func updateColorWheelAndSlider(color: UIColor)
 }

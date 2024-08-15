@@ -37,7 +37,7 @@ extension HomeViewModel: HomeBusinessLogic {
 
         guard let currentColor = currentColor else { return }
         
-        view?.updateColorWheel(color: currentColor)
+        view?.updateColorWheelAndSlider(color: currentColor)
     }
 
     func updateColorWheel(color: ColorWheelNewColor) {

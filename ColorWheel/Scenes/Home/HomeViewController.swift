@@ -100,9 +100,9 @@ extension HomeViewController: HomeDisplayLogic {
         colorWheelView.setViewBrightness(brightness)
     }
 
-    func updateColorWheel(color: UIColor) {
-        let brightness = colorWheelView.brightness
+    func updateColorWheelAndSlider(color: UIColor) {
         colorWheelView.setViewColor(color)
+        let brightness = colorWheelView.brightness
         brightnessSliderView.updateSliderValue(value: brightness)
     }
 }
