@@ -63,6 +63,7 @@
 		A4C746A32C6E33B1007D811C /* SegmentedControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlView.swift; sourceTree = "<group>"; };
 		A4C746A72C6E41DD007D811C /* ColorWheelView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorWheelView.swift; sourceTree = "<group>"; };
 		A4C746AA2C6E4925007D811C /* BrightnessSliderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BrightnessSliderView.swift; sourceTree = "<group>"; };
+		A4C746AC2C6E5FF0007D811C /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +94,7 @@
 		A4C746522C6E295C007D811C = {
 			isa = PBXGroup;
 			children = (
+				A4C746AC2C6E5FF0007D811C /* README.md */,
 				A4C7465D2C6E295C007D811C /* ColorWheel */,
 				A4C746742C6E2960007D811C /* ColorWheelTests */,
 				A4C7467E2C6E2960007D811C /* ColorWheelUITests */,
