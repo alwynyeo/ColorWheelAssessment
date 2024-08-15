@@ -7,6 +7,12 @@
 
 import UIKit
 
+// Type alias for RGB color values
+typealias RGB = (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)
+
+// Type alias for HSV color values
+typealias HSV = (hue: CGFloat, saturation: CGFloat, brightness: CGFloat, alpha: CGFloat)
+
 struct ColorWheelNewColor {
     let hue: CGFloat
     let saturation: CGFloat
@@ -15,25 +21,28 @@ struct ColorWheelNewColor {
 }
 
 protocol ColorWheelDelegate: AnyObject {
-    func colorWheelDidChange(newColor: ColorWheelNewColor)
+    func colorWheelDidChange(_ newColor: ColorWheelNewColor)
 }
 
 final class ColorWheelView: UIView {
 
     // Public properties
     var indicatorCircleRadius: CGFloat = 17.5
-    var indicatorColor: CGColor = UIColor.white.cgColor
+    var indicatorColor: CGColor = Color.white.cgColor
     var indicatorBorderWidth: CGFloat = 2.0
 
+
     // Color, can only be set privately
-    private(set) var color: UIColor = UIColor.white // Initial color
+    private(set) var color: UIColor = Color.white // Initial color
+
+    // Brightness, can only be set privately
+    private(set) var brightness: CGFloat = 1.0 // Initial brightness
 
     // Layer for the Hue and Saturation wheel
     private var wheelLayer: CALayer!
 
     // Overlay layer for the brightness
     private var brightnessLayer: CAShapeLayer!
-    private var brightness: CGFloat = 1.0
 
     // Layer for the indicator
     private var indicatorLayer: CAShapeLayer!
@@ -42,24 +51,24 @@ final class ColorWheelView: UIView {
     // Retina scaling factor
     let scale: CGFloat = UIScreen.main.scale
 
+    // MARK: - Delegate
+
     weak var delegate: ColorWheelDelegate?
 
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
+    // MARK: - Object Lifecycle
 
-    init(frame: CGRect, color: UIColor = UIColor.white) {
+    init(frame: CGRect, color: UIColor = Color.white) {
         super.init(frame: frame)
 
         self.color = color
 
         // Layer for the Hue/Saturation wheel
-        let (whiteLayerWidth, whiteLayerHeight) = (frame.width, frame.height)
+        let (width, height) = (frame.width, frame.height)
         let whiteLayerFrame = CGRect(
             x: 0,
             y: 0,
-            width: whiteLayerWidth,
-            height: whiteLayerHeight
+            width: width,
+            height: height
         )
         wheelLayer = CALayer()
         wheelLayer.frame = whiteLayerFrame
@@ -68,16 +77,15 @@ final class ColorWheelView: UIView {
 
         // Layer for the brightness
         brightnessLayer = CAShapeLayer()
-        let (brightnessLayerRoundedRectWidth, brightnessLayerRoundedRectHeight) = (frame.width - 0.5, frame.height - 0.5)
         let brightnessLayerRoundedRect = CGRect(
             x: 0,
             y: 0,
-            width: brightnessLayerRoundedRectWidth,
-            height: brightnessLayerRoundedRectHeight
+            width: width,
+            height: height
         )
         let path = UIBezierPath(
             roundedRect: brightnessLayerRoundedRect,
-            cornerRadius: (brightnessLayerRoundedRectHeight - 0.0) / 2
+            cornerRadius: height / 2
         ).cgPath
         brightnessLayer.path = path
         layer.addSublayer(brightnessLayer)
@@ -92,6 +100,12 @@ final class ColorWheelView: UIView {
         setViewColor(color)
     }
 
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+    }
+
+    // MARK: - Override Parent Methods
+
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         touchHandler(touches)
     }
@@ -104,6 +118,63 @@ final class ColorWheelView: UIView {
         touchHandler(touches)
     }
 
+    // MARK: - Helpers
+
+    func setViewColor(_ color: UIColor!) {
+        // Update the entire view with a given color
+
+        var hue: CGFloat = 0.0
+        var saturation: CGFloat = 0.0
+        var brightness: CGFloat = 0.0
+        var alpha: CGFloat = 0.0
+
+        let isSuccess: Bool = color.getHue(
+            &hue,
+            saturation: &saturation,
+            brightness: &brightness,
+            alpha: &alpha
+        )
+
+        guard isSuccess else {
+            print("Error happened under \(#function) at line \(#line) in \(#fileID) file.")
+            return
+        }
+
+        self.color = color
+        self.brightness = brightness
+        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - brightness).cgColor
+        point = pointAtHueSaturation(hue, saturation: saturation)
+        drawIndicator()
+    }
+
+    func setViewBrightness(_ _brightness: CGFloat) {
+        // Update the brightness of the view
+
+        var hue: CGFloat = 0.0
+        var saturation: CGFloat = 0.0
+        var brightness: CGFloat = 0.0
+        var alpha: CGFloat = 0.0
+
+        let isSuccess: Bool = color.getHue(
+            &hue,
+            saturation: &saturation,
+            brightness: &brightness,
+            alpha: &alpha
+        )
+
+        guard isSuccess else {
+            print("Error happened under \(#function) at line \(#line) in \(#fileID) file.")
+            return
+        }
+
+        self.brightness = _brightness
+        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - _brightness).cgColor
+        color = UIColor(hue: hue, saturation: saturation, brightness: _brightness, alpha: 1.0)
+        drawIndicator()
+    }
+}
+
+private extension ColorWheelView {
     func touchHandler(_ touches: Set<UITouch>) {
         // Set reference to the location of the touch in member point
 
@@ -136,7 +207,7 @@ final class ColorWheelView: UIView {
         )
 
         // Notify delegate of the new color
-        delegate?.colorWheelDidChange(newColor: newColor)
+        delegate?.colorWheelDidChange(newColor)
 
         // Draw the indicator
         drawIndicator()
@@ -162,7 +233,7 @@ final class ColorWheelView: UIView {
         indicatorLayer.shadowOpacity = 0.5
         indicatorLayer.shadowOffset = CGSize(width: 0, height: 4)
         indicatorLayer.shadowRadius = 23.0
-        indicatorLayer.shadowColor = UIColor.black.cgColor
+        indicatorLayer.shadowColor = Color.black.cgColor
         indicatorLayer.path = path
         indicatorLayer.fillColor = color.cgColor
     }
@@ -287,123 +358,65 @@ final class ColorWheelView: UIView {
         return CGPoint(x: x, y: y)
     }
 
-    func setViewColor(_ color: UIColor!) {
-        // Update the entire view with a given color
+    func hsv2rgb(_ hsv: HSV) -> RGB {
+        // Converts HSV to an RGB color
+        let hue = hsv.hue.truncatingRemainder(dividingBy: 1) * 6
+        let saturation = max(0, min(hsv.saturation, 1))
+        let brightness = max(0, min(hsv.brightness, 1))
 
-        var hue: CGFloat = 0.0
-        var saturation: CGFloat = 0.0
-        var brightness: CGFloat = 0.0
-        var alpha: CGFloat = 0.0
+        let i = Int(hue)
+        let f = hue - CGFloat(i)
+        let p = brightness * (1 - saturation)
+        let q = brightness * (1 - f * saturation)
+        let t = brightness * (1 - (1 - f) * saturation)
 
-        let isSuccess: Bool = color.getHue(
-            &hue,
-            saturation: &saturation,
-            brightness: &brightness,
-            alpha: &alpha
-        )
+        let (r, g, b): (CGFloat, CGFloat, CGFloat)
 
-        guard isSuccess else {
-            print("SwiftHSVColorPicker: exception <The color provided to SwiftHSVColorPicker is not convertible to HSV>")
-            return
+        switch i % 6 {
+            case 0: (r, g, b) = (brightness, t, p)
+            case 1: (r, g, b) = (q, brightness, p)
+            case 2: (r, g, b) = (p, brightness, t)
+            case 3: (r, g, b) = (p, q, brightness)
+            case 4: (r, g, b) = (t, p, brightness)
+            case 5: (r, g, b) = (brightness, p, q)
+            default: (r, g, b) = (brightness, t, p) // Default case for safety
         }
 
-        self.color = color
-        self.brightness = brightness
-        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - brightness).cgColor
-        point = pointAtHueSaturation(hue, saturation: saturation)
-        drawIndicator()
+        return (red: r, green: g, blue: b, alpha: hsv.alpha)
     }
 
-    func setViewBrightness(_ _brightness: CGFloat) {
-        // Update the brightness of the view
+    func rgb2hsv(_ rgb: RGB) -> HSV {
+        // Converts RGB to an HSV color
+        let red = rgb.red
+        let green = rgb.green
+        let blue = rgb.blue
 
-        var hue: CGFloat = 0.0
-        var saturation: CGFloat = 0.0
-        var brightness: CGFloat = 0.0
-        var alpha: CGFloat = 0.0
+        let maxV = max(red, max(green, blue))
+        let minV = min(red, min(green, blue))
+        let delta = maxV - minV
 
-        let isSuccess: Bool = color.getHue(
-            &hue,
-            saturation: &saturation,
-            brightness: &brightness,
-            alpha: &alpha
-        )
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        let brightness = maxV
 
-        guard isSuccess else {
-            print("SwiftHSVColorPicker: exception <The color provided to SwiftHSVColorPicker is not convertible to HSV>")
-            return
+        if delta > 0 {
+            saturation = delta / brightness
+
+            if maxV == red {
+                hue = (green - blue) / delta
+            } else if maxV == green {
+                hue = 2 + (blue - red) / delta
+            } else {
+                hue = 4 + (red - green) / delta
+            }
+
+            hue /= 6
+            if hue < 0 {
+                hue += 1
+            }
         }
 
-        self.brightness = _brightness
-        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - _brightness).cgColor
-        color = UIColor(hue: hue, saturation: saturation, brightness: _brightness, alpha: 1.0)
-        drawIndicator()
-    }
-}
-
-// Typealias for RGB color values
-typealias RGB = (red: CGFloat, green: CGFloat, blue: CGFloat, alpha: CGFloat)
-
-// Typealias for HSV color values
-typealias HSV = (hue: CGFloat, saturation: CGFloat, brightness: CGFloat, alpha: CGFloat)
-
-func hsv2rgb(_ hsv: HSV) -> RGB {
-    // Converts HSV to an RGB color
-    let hue = hsv.hue.truncatingRemainder(dividingBy: 1) * 6
-    let saturation = max(0, min(hsv.saturation, 1))
-    let brightness = max(0, min(hsv.brightness, 1))
-
-    let i = Int(hue)
-    let f = hue - CGFloat(i)
-    let p = brightness * (1 - saturation)
-    let q = brightness * (1 - f * saturation)
-    let t = brightness * (1 - (1 - f) * saturation)
-
-    let (r, g, b): (CGFloat, CGFloat, CGFloat)
-
-    switch i % 6 {
-        case 0: (r, g, b) = (brightness, t, p)
-        case 1: (r, g, b) = (q, brightness, p)
-        case 2: (r, g, b) = (p, brightness, t)
-        case 3: (r, g, b) = (p, q, brightness)
-        case 4: (r, g, b) = (t, p, brightness)
-        case 5: (r, g, b) = (brightness, p, q)
-        default: (r, g, b) = (brightness, t, p) // Default case for safety
+        return (hue: hue, saturation: saturation, brightness: brightness, alpha: rgb.alpha)
     }
 
-    return (red: r, green: g, blue: b, alpha: hsv.alpha)
-}
-
-func rgb2hsv(_ rgb: RGB) -> HSV {
-    // Converts RGB to an HSV color
-    let red = rgb.red
-    let green = rgb.green
-    let blue = rgb.blue
-
-    let maxV = max(red, max(green, blue))
-    let minV = min(red, min(green, blue))
-    let delta = maxV - minV
-
-    var hue: CGFloat = 0
-    var saturation: CGFloat = 0
-    let brightness = maxV
-
-    if delta > 0 {
-        saturation = delta / brightness
-
-        if maxV == red {
-            hue = (green - blue) / delta
-        } else if maxV == green {
-            hue = 2 + (blue - red) / delta
-        } else {
-            hue = 4 + (red - green) / delta
-        }
-
-        hue /= 6
-        if hue < 0 {
-            hue += 1
-        }
-    }
-
-    return (hue: hue, saturation: saturation, brightness: brightness, alpha: rgb.alpha)
 }
