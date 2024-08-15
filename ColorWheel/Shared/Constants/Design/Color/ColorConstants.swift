@@ -13,6 +13,7 @@ extension Constants.Design {
     enum Color {
         static let background = UIColor(hexString: "#1a1a1a")
         static let white = UIColor.white
+        static let black = UIColor.black
         static let elementBackground = UIColor(hexString: "#2c2c2c")
         static let elementSelectedBackground = UIColor(hexString: "#3b3b3b")
 

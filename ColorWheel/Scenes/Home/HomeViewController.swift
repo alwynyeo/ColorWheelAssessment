@@ -18,6 +18,8 @@ final class HomeViewController: UIViewController {
 
     private var colorWheelView: ColorWheelView!
 
+    private var brightnessSliderView: BrightnessSliderView!
+
     private var mainStackView: UIStackView!
 
     // MARK: - State
@@ -69,17 +71,59 @@ final class HomeViewController: UIViewController {
 }
 
 // MARK: - HomeDisplayLogic Extension
-extension HomeViewController: HomeDisplayLogic {}
+extension HomeViewController: HomeDisplayLogic {
+    func updateFirstSegmentedControlViewStyle(isSelected: Bool) {
+        firstSegmentedControlView.setIsSelected(isSelected)
+    }
 
-extension HomeViewController: ColorWheelDelegate {
-    func colorWheelDidChange(newColor: ColorWheelNewColor) {
+    func updateSecondSegmentedControlViewStyle(isSelected: Bool) {
+        secondSegmentedControlView.setIsSelected(isSelected)
+    }
 
+    func updateThirdSegmentedControlViewStyle(isSelected: Bool) {
+        thirdSegmentedControlView.setIsSelected(isSelected)
+    }
+
+    func updateFirstSegmentedControlViewCircularColor(with color: UIColor) {
+        firstSegmentedControlView.setSelectedColor(with: color)
+    }
+
+    func updateSecondSegmentedControlViewCircularColor(with color: UIColor) {
+        secondSegmentedControlView.setSelectedColor(with: color)
+    }
+
+    func updateThirdSegmentedControlViewCircularColor(with color: UIColor) {
+        thirdSegmentedControlView.setSelectedColor(with: color)
+    }
+
+    func updateColorWheel(brightness: CGFloat) {
+        colorWheelView.setViewBrightness(brightness)
+    }
+
+    func updateColorWheel(color: UIColor) {
+        colorWheelView.setViewColor(color)
     }
 }
 
+// MARK: - ColorWheelDelegate Extension
+extension HomeViewController: ColorWheelDelegate {
+    func colorWheelDidChange(_ newColor: ColorWheelNewColor) {
+        viewModel.updateColorWheel(color: newColor)
+    }
+}
+
+// MARK: - SegmentedControlViewDelegate Extension
 extension HomeViewController: SegmentedControlViewDelegate {
-    func didTap(type: SegmentedControlViewTypeEnum?) {
-        print("tap")
+    func didTap(_ type: SegmentedControlViewTypeEnum?, currentColor: UIColor?) {
+        viewModel.updateSelectedSegmentedControlView(for: type, currentColor: currentColor)
+    }
+}
+
+// MARK: - BrightnessSliderViewDelegate Extension
+extension HomeViewController: BrightnessSliderViewDelegate {
+    func sliderDidChange(_ value: Float) {
+        let color = colorWheelView.color
+        viewModel.updateBrightness(value: value, color: color)
     }
 }
 
@@ -138,7 +182,10 @@ private extension HomeViewController {
         colorWheelView.delegate = self
     }
 
-    func setupBrightnessSlider() {}
+    func setupBrightnessSlider() {
+        brightnessSliderView = BrightnessSliderView()
+        brightnessSliderView.delegate = self
+    }
 
     func setupMainStackView() {
         mainStackView = UIStackView()
@@ -150,6 +197,7 @@ private extension HomeViewController {
 
         mainStackView.addArrangedSubview(segmentedControlStackView)
         mainStackView.addArrangedSubview(colorWheelView)
+        mainStackView.addArrangedSubview(brightnessSliderView)
 
         view.addSubview(mainStackView)
 
