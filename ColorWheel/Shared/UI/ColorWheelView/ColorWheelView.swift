@@ -353,8 +353,8 @@ private extension ColorWheelView {
 
         let dimension = min(wheelLayer.frame.width, wheelLayer.frame.height)
         let radius = saturation * dimension / 2
-        let x = dimension / 2 + radius * cos(hue * CGFloat((Double.pi) * 2) + 20)
-        let y = dimension / 2 + radius * sin(hue * CGFloat((Double.pi) * 2) + 20)
+        let x = dimension / 2 + radius * cos(hue * CGFloat((Double.pi) * 2))
+        let y = dimension / 2 + radius * sin(hue * CGFloat((Double.pi) * 2))
         return CGPoint(x: x, y: y)
     }
 
