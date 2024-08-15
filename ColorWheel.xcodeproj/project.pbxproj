@@ -20,6 +20,7 @@
 		A4C746972C6E2CBE007D811C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C746962C6E2CBE007D811C /* Constants.swift */; };
 		A4C7469C2C6E2D7E007D811C /* ColorConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C7469B2C6E2D7E007D811C /* ColorConstants.swift */; };
 		A4C746A12C6E2E25007D811C /* UIColor+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C746A02C6E2E25007D811C /* UIColor+Extension.swift */; };
+		A4C746A42C6E33B1007D811C /* SegmentedControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C746A32C6E33B1007D811C /* SegmentedControlView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -57,6 +58,7 @@
 		A4C746962C6E2CBE007D811C /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		A4C7469B2C6E2D7E007D811C /* ColorConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorConstants.swift; sourceTree = "<group>"; };
 		A4C746A02C6E2E25007D811C /* UIColor+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Extension.swift"; sourceTree = "<group>"; };
+		A4C746A32C6E33B1007D811C /* SegmentedControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControlView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,6 +174,7 @@
 		A4C746982C6E2D32007D811C /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				A4C746A22C6E3376007D811C /* UI */,
 				A4C7469E2C6E2E0B007D811C /* Extensions */,
 				A4C746992C6E2D3E007D811C /* Constants */,
 			);
@@ -217,6 +220,22 @@
 				A4C746A02C6E2E25007D811C /* UIColor+Extension.swift */,
 			);
 			path = UIKit;
+			sourceTree = "<group>";
+		};
+		A4C746A22C6E3376007D811C /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				A4C746A52C6E33D6007D811C /* SegmentedControlView */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		A4C746A52C6E33D6007D811C /* SegmentedControlView */ = {
+			isa = PBXGroup;
+			children = (
+				A4C746A32C6E33B1007D811C /* SegmentedControlView.swift */,
+			);
+			path = SegmentedControlView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -350,6 +369,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4C746632C6E295C007D811C /* HomeViewController.swift in Sources */,
+				A4C746A42C6E33B1007D811C /* SegmentedControlView.swift in Sources */,
 				A4C746932C6E2C4B007D811C /* HomeViewTypes.swift in Sources */,
 				A4C7465F2C6E295C007D811C /* AppDelegate.swift in Sources */,
 				A4C746972C6E2CBE007D811C /* Constants.swift in Sources */,

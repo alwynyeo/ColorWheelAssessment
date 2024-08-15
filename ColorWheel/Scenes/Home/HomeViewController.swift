@@ -9,7 +9,15 @@ import UIKit
 
 final class HomeViewController: UIViewController {
 
-    // MARK: - Declarations
+    // MARK: - UI
+    
+    private var firstSegmentedControlView: SegmentedControlView!
+    private var secondSegmentedControlView: SegmentedControlView!
+    private var thirdSegmentedControlView: SegmentedControlView!
+    private var segmentedControlStackView: UIStackView!
+    private var mainStackView: UIStackView!
+
+    // MARK: - State
 
     var viewModel: HomeBusinessLogic!
 
@@ -60,9 +68,76 @@ final class HomeViewController: UIViewController {
 // MARK: - HomeDisplayLogic Extension
 extension HomeViewController: HomeDisplayLogic {}
 
+extension HomeViewController: SegmentedControlViewDelegate {
+    func didTap(type: SegmentedControlViewTypeEnum?) {
+        print("tap")
+    }
+}
+
 // MARK: - Programmatic UI Setup
 private extension HomeViewController {
     func setupUI() {
         view.backgroundColor = Color.background
+        setupSegmentedControlViews()
+        setupSegmentedControlStackView()
+        setupMainStackView()
+    }
+
+    func setupSegmentedControlViews() {
+        // FirstSegmentedControlView
+        firstSegmentedControlView = SegmentedControlView(selectedColor: Color.teal)
+        firstSegmentedControlView.delegate = self
+        firstSegmentedControlView.tag = SegmentedControlViewTypeEnum.first.rawValue
+
+        // SecondSegmentedControlView
+        secondSegmentedControlView = SegmentedControlView(selectedColor: Color.green)
+        secondSegmentedControlView.delegate = self
+        secondSegmentedControlView.tag = SegmentedControlViewTypeEnum.second.rawValue
+
+        // ThirdSegmentedControlView
+        thirdSegmentedControlView = SegmentedControlView(selectedColor: Color.orange)
+        thirdSegmentedControlView.delegate = self
+        thirdSegmentedControlView.tag = SegmentedControlViewTypeEnum.third.rawValue
+    }
+
+    func setupSegmentedControlStackView() {
+        segmentedControlStackView = UIStackView()
+        segmentedControlStackView.axis = NSLayoutConstraint.Axis.horizontal
+        segmentedControlStackView.distribution = UIStackView.Distribution.fillEqually
+        segmentedControlStackView.spacing = 0.0
+        segmentedControlStackView.alignment = UIStackView.Alignment.fill
+        segmentedControlStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        segmentedControlStackView.addArrangedSubview(firstSegmentedControlView)
+        segmentedControlStackView.addArrangedSubview(secondSegmentedControlView)
+        segmentedControlStackView.addArrangedSubview(thirdSegmentedControlView)
+
+        let constraints = [
+            segmentedControlStackView.heightAnchor.constraint(equalToConstant: 120),
+        ]
+        
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    func setupMainStackView() {
+        mainStackView = UIStackView()
+        mainStackView.axis = NSLayoutConstraint.Axis.vertical
+        mainStackView.distribution = UIStackView.Distribution.fill
+        mainStackView.spacing = 16.0
+        mainStackView.alignment = UIStackView.Alignment.fill
+        mainStackView.translatesAutoresizingMaskIntoConstraints = false
+
+        mainStackView.addArrangedSubview(segmentedControlStackView)
+
+        view.addSubview(mainStackView)
+
+        let constraints = [
+            mainStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
+            mainStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
+            mainStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            mainStackView.bottomAnchor.constraint(lessThanOrEqualTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+        ]
+
+        NSLayoutConstraint.activate(constraints)
     }
 }
