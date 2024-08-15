@@ -140,16 +140,18 @@ final class ColorWheelView: UIView {
             return
         }
 
+        // Update the view's brightness and color
         self.color = color
         self.brightness = brightness
         brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - brightness).cgColor
         point = pointAtHueSaturation(hue, saturation: saturation)
+
+        // Redraw the indicator
         drawIndicator()
     }
 
     func setViewBrightness(_ _brightness: CGFloat) {
         // Update the brightness of the view
-
         var hue: CGFloat = 0.0
         var saturation: CGFloat = 0.0
         var brightness: CGFloat = 0.0
@@ -167,9 +169,20 @@ final class ColorWheelView: UIView {
             return
         }
 
+        // Calculate the scaled point and retrieve hue and saturation at that point
+        let point = CGPoint(x: point.x * scale, y: point.y * scale)
+        let colorAtPoint = hueSaturationAtPoint(point)
+
+        // Update hue and saturation based on the new brightness
+        hue = _brightness > 0.01 ? colorAtPoint.hue : 0.0
+        saturation = _brightness > 0.01 ? colorAtPoint.saturation : 0.0
+
+        // Update the view's brightness and color
         self.brightness = _brightness
         brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - _brightness).cgColor
         color = UIColor(hue: hue, saturation: saturation, brightness: _brightness, alpha: 1.0)
+
+        // Redraw the indicator
         drawIndicator()
     }
 }
@@ -215,7 +228,7 @@ private extension ColorWheelView {
 
     func drawIndicator() {
         // Draw the indicator
-        guard let point = point else { return }
+        guard point != nil else { return }
 
         let roundedRect = CGRect(
             x: point.x - indicatorCircleRadius,
@@ -298,10 +311,10 @@ private extension ColorWheelView {
                     rgb = hsv2rgb(hsv)
                 }
                 let offset = Int(4 * (x + y * dimension))
-                bitmap?[offset] = UInt8(rgb.red*255)
-                bitmap?[offset + 1] = UInt8(rgb.green*255)
-                bitmap?[offset + 2] = UInt8(rgb.blue*255)
-                bitmap?[offset + 3] = UInt8(rgb.alpha*255)
+                bitmap?[offset] = UInt8(rgb.red * 255)
+                bitmap?[offset + 1] = UInt8(rgb.green * 255)
+                bitmap?[offset + 2] = UInt8(rgb.blue * 255)
+                bitmap?[offset + 3] = UInt8(rgb.alpha * 255)
             }
         }
 
@@ -384,39 +397,39 @@ private extension ColorWheelView {
 
         return (red: r, green: g, blue: b, alpha: hsv.alpha)
     }
-
-    func rgb2hsv(_ rgb: RGB) -> HSV {
-        // Converts RGB to an HSV color
-        let red = rgb.red
-        let green = rgb.green
-        let blue = rgb.blue
-
-        let maxV = max(red, max(green, blue))
-        let minV = min(red, min(green, blue))
-        let delta = maxV - minV
-
-        var hue: CGFloat = 0
-        var saturation: CGFloat = 0
-        let brightness = maxV
-
-        if delta > 0 {
-            saturation = delta / brightness
-
-            if maxV == red {
-                hue = (green - blue) / delta
-            } else if maxV == green {
-                hue = 2 + (blue - red) / delta
-            } else {
-                hue = 4 + (red - green) / delta
-            }
-
-            hue /= 6
-            if hue < 0 {
-                hue += 1
-            }
-        }
-
-        return (hue: hue, saturation: saturation, brightness: brightness, alpha: rgb.alpha)
-    }
+//
+//    func rgb2hsv(_ rgb: RGB) -> HSV {
+//        // Converts RGB to an HSV color
+//        let red = rgb.red
+//        let green = rgb.green
+//        let blue = rgb.blue
+//
+//        let maxV = max(red, max(green, blue))
+//        let minV = min(red, min(green, blue))
+//        let delta = maxV - minV
+//
+//        var hue: CGFloat = 0
+//        var saturation: CGFloat = 0
+//        let brightness = maxV
+//
+//        if delta > 0 {
+//            saturation = delta / brightness
+//
+//            if maxV == red {
+//                hue = (green - blue) / delta
+//            } else if maxV == green {
+//                hue = 2 + (blue - red) / delta
+//            } else {
+//                hue = 4 + (red - green) / delta
+//            }
+//
+//            hue /= 6
+//            if hue < 0 {
+//                hue += 1
+//            }
+//        }
+//
+//        return (hue: hue, saturation: saturation, brightness: brightness, alpha: rgb.alpha)
+//    }
 
 }
