@@ -14,7 +14,7 @@ enum SegmentedControlViewTypeEnum: Int {
 }
 
 protocol SegmentedControlViewDelegate: AnyObject {
-    func didTap(type: SegmentedControlViewTypeEnum?)
+    func didTap(_ type: SegmentedControlViewTypeEnum?, currentColor: UIColor?)
 }
 
 final class SegmentedControlView: UIView {
@@ -23,6 +23,7 @@ final class SegmentedControlView: UIView {
 
     private var colorView: UIView!
     private var tapGestureRecognizer: UITapGestureRecognizer!
+    private var selectedColor: UIColor!
 
     // MARK: - Delegate
 
@@ -42,7 +43,7 @@ final class SegmentedControlView: UIView {
 
     convenience init(selectedColor: UIColor) {
         self.init(frame: CGRect.zero)
-        colorView.backgroundColor = selectedColor
+        setSelectedColor(with: selectedColor)
     }
 
     // MARK: - Helpers
@@ -52,13 +53,14 @@ final class SegmentedControlView: UIView {
     }
 
     func setSelectedColor(with newColor: UIColor) {
+        selectedColor = newColor
         colorView.backgroundColor = newColor
     }
 
     // MARK: - Private Helpers
     @objc private func handleTapGestureRecognizer(_ sender: UITapGestureRecognizer) {
         let type = SegmentedControlViewTypeEnum(rawValue: tag)
-        delegate?.didTap(type: type)
+        delegate?.didTap(type, currentColor: selectedColor)
     }
 }
 
@@ -74,6 +76,7 @@ private extension SegmentedControlView {
         let frame = CGRect(x: 0, y: 0, width: 35, height: 35)
         colorView = UIView(frame: frame)
         colorView.backgroundColor = Color.white
+        selectedColor = Color.white
         colorView.layer.cornerRadius = frame.width / 2
         colorView.clipsToBounds = true
         colorView.translatesAutoresizingMaskIntoConstraints = false
