@@ -42,7 +42,7 @@ final class ColorWheelView: UIView {
     private var wheelLayer: CALayer!
 
     // Overlay layer for the brightness
-    private var brightnessLayer: CAShapeLayer!
+    private var brightnessLayer: CALayer!
 
     // Layer for the indicator
     private var indicatorLayer: CAShapeLayer!
@@ -76,18 +76,16 @@ final class ColorWheelView: UIView {
         layer.addSublayer(wheelLayer)
 
         // Layer for the brightness
-        brightnessLayer = CAShapeLayer()
-        let brightnessLayerRoundedRect = CGRect(
+        brightnessLayer = CALayer()
+        brightnessLayer.frame = CGRect(
             x: 0,
             y: 0,
             width: width,
             height: height
         )
-        let path = UIBezierPath(
-            roundedRect: brightnessLayerRoundedRect,
-            cornerRadius: height / 2
-        ).cgPath
-        brightnessLayer.path = path
+        brightnessLayer.cornerRadius = height / 2
+        brightnessLayer.backgroundColor = UIColor.clear.cgColor // Set this if you need a background color
+
         layer.addSublayer(brightnessLayer)
 
         // Layer for the indicator
@@ -143,7 +141,7 @@ final class ColorWheelView: UIView {
         // Update the view's brightness and color
         self.color = color
         self.brightness = brightness
-        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - brightness).cgColor
+        brightnessLayer.backgroundColor = UIColor(white: 0, alpha: 1.0 - brightness).cgColor
         point = pointAtHueSaturation(hue, saturation: saturation)
 
         // Redraw the indicator
@@ -179,7 +177,7 @@ final class ColorWheelView: UIView {
 
         // Update the view's brightness and color
         self.brightness = _brightness
-        brightnessLayer.fillColor = UIColor(white: 0, alpha: 1.0 - _brightness).cgColor
+        brightnessLayer.backgroundColor = UIColor(white: 0, alpha: 1.0 - _brightness).cgColor
         color = UIColor(hue: hue, saturation: saturation, brightness: _brightness, alpha: 1.0)
 
         // Redraw the indicator
