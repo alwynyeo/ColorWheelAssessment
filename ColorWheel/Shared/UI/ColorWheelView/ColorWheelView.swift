@@ -395,39 +395,4 @@ private extension ColorWheelView {
 
         return (red: r, green: g, blue: b, alpha: hsv.alpha)
     }
-//
-//    func rgb2hsv(_ rgb: RGB) -> HSV {
-//        // Converts RGB to an HSV color
-//        let red = rgb.red
-//        let green = rgb.green
-//        let blue = rgb.blue
-//
-//        let maxV = max(red, max(green, blue))
-//        let minV = min(red, min(green, blue))
-//        let delta = maxV - minV
-//
-//        var hue: CGFloat = 0
-//        var saturation: CGFloat = 0
-//        let brightness = maxV
-//
-//        if delta > 0 {
-//            saturation = delta / brightness
-//
-//            if maxV == red {
-//                hue = (green - blue) / delta
-//            } else if maxV == green {
-//                hue = 2 + (blue - red) / delta
-//            } else {
-//                hue = 4 + (red - green) / delta
-//            }
-//
-//            hue /= 6
-//            if hue < 0 {
-//                hue += 1
-//            }
-//        }
-//
-//        return (hue: hue, saturation: saturation, brightness: brightness, alpha: rgb.alpha)
-//    }
-
 }

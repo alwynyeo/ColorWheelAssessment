@@ -11,7 +11,7 @@ final class HomeViewModel {
 
     // MARK: - Declarations
 
-    weak var view: HomeDisplayLogic?
+    private(set) weak var view: HomeDisplayLogic?
 
     private var selectedSegmentedControlViewType: SegmentedControlViewTypeEnum?
 
