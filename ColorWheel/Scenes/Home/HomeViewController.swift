@@ -10,16 +10,14 @@ import UIKit
 final class HomeViewController: UIViewController {
 
     // MARK: - UI
-    
+    private var scrollContentView: UIView!
+    private var scrollView: UIScrollView!
     private var firstSegmentedControlView: SegmentedControlView!
     private var secondSegmentedControlView: SegmentedControlView!
     private var thirdSegmentedControlView: SegmentedControlView!
     private var segmentedControlStackView: UIStackView!
-
     private var colorWheelView: ColorWheelView!
-
     private var brightnessSliderView: BrightnessSliderView!
-
     private var mainStackView: UIStackView!
 
     // MARK: - State
@@ -133,6 +131,10 @@ extension HomeViewController: BrightnessSliderViewDelegate {
 private extension HomeViewController {
     func setupUI() {
         view.backgroundColor = Color.background
+        setupScrollView()
+        setupScrollViewContentView()
+
+        // Components
         setupSegmentedControlViews()
         setupSegmentedControlStackView()
         setupColorWheelView()
@@ -181,6 +183,7 @@ private extension HomeViewController {
         let frame = CGRect(x: 0, y: 0, width: width, height: width)
 
         colorWheelView = ColorWheelView(frame: frame)
+        colorWheelView.frame = frame
         colorWheelView.delegate = self
     }
 
@@ -201,13 +204,53 @@ private extension HomeViewController {
         mainStackView.addArrangedSubview(colorWheelView)
         mainStackView.addArrangedSubview(brightnessSliderView)
 
-        view.addSubview(mainStackView)
+        scrollContentView.addSubview(mainStackView)
 
         let constraints = [
-            mainStackView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 16),
-            mainStackView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 16),
-            mainStackView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
-            mainStackView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -16),
+            mainStackView.topAnchor.constraint(equalTo: scrollContentView.topAnchor, constant: 16),
+            mainStackView.leadingAnchor.constraint(equalTo: scrollContentView.leadingAnchor, constant: 16),
+            mainStackView.trailingAnchor.constraint(equalTo: scrollContentView.trailingAnchor, constant: -16),
+            mainStackView.bottomAnchor.constraint(equalTo: scrollContentView.bottomAnchor, constant: -16),
+        ]
+
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    func setupScrollViewContentView() {
+        scrollContentView = UIView()
+        scrollContentView.translatesAutoresizingMaskIntoConstraints = false
+
+        scrollView.addSubview(scrollContentView)
+
+        let heightAnchor = scrollContentView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
+        heightAnchor.priority = UILayoutPriority.defaultLow
+
+        let constraints = [
+            scrollContentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            scrollContentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            scrollContentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            scrollContentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            scrollContentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            heightAnchor,
+        ]
+
+        NSLayoutConstraint.activate(constraints)
+    }
+
+    func setupScrollView() {
+        scrollView = UIScrollView()
+        scrollView.alwaysBounceVertical = true
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(scrollView)
+
+        let constraints = [
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ]
 
         NSLayoutConstraint.activate(constraints)
