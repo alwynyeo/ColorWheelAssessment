@@ -45,11 +45,13 @@ final class ColorWheelView: UIView {
     private var brightnessLayer: CALayer!
 
     // Layer for the indicator
-    private var indicatorLayer: CAShapeLayer!
+    private var indicatorLayer: CALayer!
+
+    // Coordinate
     private var point: CGPoint!
 
     // Retina scaling factor
-    let scale: CGFloat = UIScreen.main.scale
+    private let scale: CGFloat = UIScreen.main.scale
 
     // MARK: - Delegate
 
@@ -89,10 +91,12 @@ final class ColorWheelView: UIView {
         layer.addSublayer(brightnessLayer)
 
         // Layer for the indicator
-        indicatorLayer = CAShapeLayer()
-        indicatorLayer.strokeColor = indicatorColor
-        indicatorLayer.lineWidth = indicatorBorderWidth
-        indicatorLayer.fillColor = nil
+        indicatorLayer = CALayer()
+        indicatorLayer.borderColor = indicatorColor
+        indicatorLayer.borderWidth = indicatorBorderWidth
+        indicatorLayer.cornerRadius = indicatorCircleRadius
+        indicatorLayer.backgroundColor = nil
+
         layer.addSublayer(indicatorLayer)
 
         setViewColor(color)
@@ -228,25 +232,31 @@ private extension ColorWheelView {
         // Draw the indicator
         guard point != nil else { return }
 
-        let roundedRect = CGRect(
+        let frame = CGRect(
             x: point.x - indicatorCircleRadius,
             y: point.y - indicatorCircleRadius,
             width: indicatorCircleRadius * 2,
             height: indicatorCircleRadius * 2
         )
 
-        let path = UIBezierPath(
-            roundedRect: roundedRect,
-            cornerRadius: indicatorCircleRadius
+        CATransaction.begin()
+        CATransaction.setDisableActions(true)
+
+        indicatorLayer.frame = frame
+        indicatorLayer.backgroundColor = color.cgColor
+
+        // Shadow
+        let shadowPath = UIBezierPath(
+            roundedRect: indicatorLayer.bounds,
+            cornerRadius: indicatorLayer.cornerRadius
         ).cgPath
 
-        indicatorLayer.shouldRasterize = true
+        indicatorLayer.shadowPath = shadowPath
         indicatorLayer.shadowOpacity = 0.5
         indicatorLayer.shadowOffset = CGSize(width: 0, height: 4)
-        indicatorLayer.shadowRadius = 23.0
-        indicatorLayer.shadowColor = Color.black.cgColor
-        indicatorLayer.path = path
-        indicatorLayer.fillColor = color.cgColor
+        indicatorLayer.shadowColor = UIColor.black.cgColor
+
+        CATransaction.commit()
     }
 
     func getIndicatorCoordinate(_ coordinate: CGPoint) -> CGPoint {
