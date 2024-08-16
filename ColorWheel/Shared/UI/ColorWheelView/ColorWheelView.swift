@@ -70,25 +70,10 @@ final class ColorWheelView: UIView {
         setup()
     }
 
-    // MARK: - Override Parent Methods
-
-    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchHandler(touches)
-    }
-
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchHandler(touches)
-    }
-
-    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
-        touchHandler(touches)
-    }
-
     // MARK: - Helpers
 
     func setViewColor(_ color: UIColor!) {
         // Update the entire view with a given color
-
         var hue: CGFloat = 0.0
         var saturation: CGFloat = 0.0
         var brightness: CGFloat = 0.0
@@ -190,20 +175,39 @@ final class ColorWheelView: UIView {
         layer.addSublayer(indicatorLayer)
 
         setViewColor(color)
+
+        // Add Gestures to the view
+        let tapGestureRecognizer = UITapGestureRecognizer()
+        tapGestureRecognizer.addTarget(self, action: #selector(handleTapGesture(_:)))
+        addGestureRecognizer(tapGestureRecognizer)
+
+        let panGestureRecognizer = UIPanGestureRecognizer()
+        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
+        addGestureRecognizer(panGestureRecognizer)
+    }
+
+    // MARK: - Selectors
+
+    @objc private func handleTapGesture(_ sender: UITapGestureRecognizer) {
+        let view = self
+        let point = sender.location(in: view)
+        gestureHandler(at: point)
+    }
+
+    @objc private func handlePanGesture(_ sender: UIPanGestureRecognizer) {
+        let view = self
+        let point = sender.location(in: view)
+        gestureHandler(at: point)
     }
 }
 
 private extension ColorWheelView {
-    func touchHandler(_ touches: Set<UITouch>) {
-        // Set reference to the location of the touch in member point
+    func gestureHandler(at _point: CGPoint) {
+        // Set reference to the location of the gesture in member point
 
-        let view = self
+        point = _point
 
-        if let touch = touches.first {
-            point = touch.location(in: view)
-        }
-
-        let indicatorCoordinate = getIndicatorCoordinate(point)
+        let indicatorCoordinate = getIndicatorCoordinate(_point)
 
         point = indicatorCoordinate
 
