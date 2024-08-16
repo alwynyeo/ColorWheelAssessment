@@ -61,49 +61,13 @@ final class ColorWheelView: UIView {
 
     init(frame: CGRect, color: UIColor = Color.white) {
         super.init(frame: frame)
-
         self.color = color
-
-        // Layer for the Hue/Saturation wheel
-        let (width, height) = (frame.width, frame.height)
-        let whiteLayerFrame = CGRect(
-            x: 0,
-            y: 0,
-            width: width,
-            height: height
-        )
-        wheelLayer = CALayer()
-        wheelLayer.frame = whiteLayerFrame
-        wheelLayer.contents = createColorWheel(wheelLayer.frame.size)
-        layer.addSublayer(wheelLayer)
-
-        // Layer for the brightness
-        brightnessLayer = CALayer()
-        brightnessLayer.frame = CGRect(
-            x: 0,
-            y: 0,
-            width: width,
-            height: height
-        )
-        brightnessLayer.cornerRadius = height / 2
-        brightnessLayer.backgroundColor = UIColor.clear.cgColor // Set this if you need a background color
-
-        layer.addSublayer(brightnessLayer)
-
-        // Layer for the indicator
-        indicatorLayer = CALayer()
-        indicatorLayer.borderColor = indicatorColor
-        indicatorLayer.borderWidth = indicatorBorderWidth
-        indicatorLayer.cornerRadius = indicatorCircleRadius
-        indicatorLayer.backgroundColor = nil
-
-        layer.addSublayer(indicatorLayer)
-
-        setViewColor(color)
+        setup()
     }
 
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+        setup()
     }
 
     // MARK: - Override Parent Methods
@@ -187,6 +151,46 @@ final class ColorWheelView: UIView {
         // Redraw the indicator
         drawIndicator()
     }
+
+    // MARK: - Private Helpers
+
+    private func setup() {
+        // Layer for the Hue/Saturation wheel
+        let (width, height) = (frame.width, frame.height)
+        let whiteLayerFrame = CGRect(
+            x: 0,
+            y: 0,
+            width: width,
+            height: height
+        )
+        wheelLayer = CALayer()
+        wheelLayer.frame = whiteLayerFrame
+        wheelLayer.contents = createColorWheel(wheelLayer.frame.size)
+        layer.addSublayer(wheelLayer)
+
+        // Layer for the brightness
+        brightnessLayer = CALayer()
+        brightnessLayer.frame = CGRect(
+            x: 0,
+            y: 0,
+            width: width,
+            height: height
+        )
+        brightnessLayer.cornerRadius = height / 2
+
+        layer.addSublayer(brightnessLayer)
+
+        // Layer for the indicator
+        indicatorLayer = CALayer()
+        indicatorLayer.borderColor = indicatorColor
+        indicatorLayer.borderWidth = indicatorBorderWidth
+        indicatorLayer.cornerRadius = indicatorCircleRadius
+        indicatorLayer.backgroundColor = nil
+
+        layer.addSublayer(indicatorLayer)
+
+        setViewColor(color)
+    }
 }
 
 private extension ColorWheelView {
@@ -205,16 +209,16 @@ private extension ColorWheelView {
 
         let point = CGPoint(x: point.x * scale, y: point.y * scale)
 
-        let color = hueSaturationAtPoint(point)
+        let colorAtPoint = hueSaturationAtPoint(point)
 
         let newColor = ColorWheelNewColor(
-            hue: color.hue,
-            saturation: color.saturation,
+            hue: colorAtPoint.hue,
+            saturation: colorAtPoint.saturation,
             brightness: brightness,
             alpha: 1.0
         )
 
-        self.color = UIColor(
+        color = UIColor(
             hue: newColor.hue,
             saturation: newColor.saturation,
             brightness: newColor.brightness,
@@ -239,6 +243,12 @@ private extension ColorWheelView {
             height: indicatorCircleRadius * 2
         )
 
+        // Shadow Path
+        let shadowPath = UIBezierPath(
+            roundedRect: indicatorLayer.bounds,
+            cornerRadius: indicatorLayer.cornerRadius
+        ).cgPath
+
         CATransaction.begin()
         CATransaction.setDisableActions(true)
 
@@ -246,15 +256,10 @@ private extension ColorWheelView {
         indicatorLayer.backgroundColor = color.cgColor
 
         // Shadow
-        let shadowPath = UIBezierPath(
-            roundedRect: indicatorLayer.bounds,
-            cornerRadius: indicatorLayer.cornerRadius
-        ).cgPath
-
         indicatorLayer.shadowPath = shadowPath
         indicatorLayer.shadowOpacity = 0.5
         indicatorLayer.shadowOffset = CGSize(width: 0, height: 4)
-        indicatorLayer.shadowColor = UIColor.black.cgColor
+        indicatorLayer.shadowColor = Color.black.cgColor
 
         CATransaction.commit()
     }
