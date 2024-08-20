@@ -20,6 +20,10 @@ final class HomeViewController: UIViewController {
     private var brightnessSliderView: BrightnessSliderView!
     private var mainStackView: UIStackView!
 
+    private var colorWheelViewHeightConstraint: NSLayoutConstraint!
+
+    private var colorWheelViewWidth: CGFloat = 0
+
     // MARK: - State
 
     var viewModel: HomeBusinessLogic!
@@ -55,7 +59,20 @@ final class HomeViewController: UIViewController {
         super.viewDidLoad()
     }
 
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        let width = view.frame.width - 32
+        colorWheelView.updateFrame(with: width)
+    }
+
     // MARK: - Override Parent Methods
+
+    override func viewWillTransition(to size: CGSize, with coordinator: any UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        let dimension = view.frame.height
+        let width = dimension - 32
+        colorWheelViewHeightConstraint.constant = width
+    }
 
     // MARK: - Setup
 
@@ -183,8 +200,16 @@ private extension HomeViewController {
         let frame = CGRect(x: 0, y: 0, width: width, height: width)
 
         colorWheelView = ColorWheelView(frame: frame)
-        colorWheelView.frame = frame
         colorWheelView.delegate = self
+        colorWheelView.translatesAutoresizingMaskIntoConstraints = false
+
+        colorWheelViewHeightConstraint = colorWheelView.heightAnchor.constraint(equalToConstant: width)
+
+        let constraints: [NSLayoutConstraint] = [
+            colorWheelViewHeightConstraint,
+        ]
+
+        NSLayoutConstraint.activate(constraints)
     }
 
     func setupBrightnessSlider() {

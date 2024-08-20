@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A4C121672C7502F10008959C /* UIDevice+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C121662C7502F10008959C /* UIDevice+Extension.swift */; };
 		A4C7465F2C6E295C007D811C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C7465E2C6E295C007D811C /* AppDelegate.swift */; };
 		A4C746612C6E295C007D811C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C746602C6E295C007D811C /* SceneDelegate.swift */; };
 		A4C746632C6E295C007D811C /* HomeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C746622C6E295C007D811C /* HomeViewController.swift */; };
@@ -43,6 +44,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A4C121662C7502F10008959C /* UIDevice+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIDevice+Extension.swift"; sourceTree = "<group>"; };
 		A4C7465B2C6E295C007D811C /* ColorWheel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColorWheel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4C7465E2C6E295C007D811C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		A4C746602C6E295C007D811C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -224,6 +226,7 @@
 			isa = PBXGroup;
 			children = (
 				A4C746A02C6E2E25007D811C /* UIColor+Extension.swift */,
+				A4C121662C7502F10008959C /* UIDevice+Extension.swift */,
 			);
 			path = UIKit;
 			sourceTree = "<group>";
@@ -392,6 +395,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A4C121672C7502F10008959C /* UIDevice+Extension.swift in Sources */,
 				A4C746AB2C6E4925007D811C /* BrightnessSliderView.swift in Sources */,
 				A4C746632C6E295C007D811C /* HomeViewController.swift in Sources */,
 				A4C746A42C6E33B1007D811C /* SegmentedControlView.swift in Sources */,

@@ -31,7 +31,6 @@ final class ColorWheelView: UIView {
     var indicatorColor: CGColor = Color.white.cgColor
     var indicatorBorderWidth: CGFloat = 2.0
 
-
     // Color, can only be set privately
     private(set) var color: UIColor = Color.white // Initial color
 
@@ -39,7 +38,7 @@ final class ColorWheelView: UIView {
     private(set) var brightness: CGFloat = 1.0 // Initial brightness
 
     // Layer for the Hue and Saturation wheel
-    private var wheelLayer: CALayer!
+    private var colorWheelLayer: CALayer!
 
     // Overlay layer for the brightness
     private var brightnessLayer: CALayer!
@@ -52,6 +51,9 @@ final class ColorWheelView: UIView {
 
     // Retina scaling factor
     private let scale: CGFloat = UIScreen.main.scale
+
+    // Width to update layer
+    private var width: CGFloat = 0
 
     // MARK: - Delegate
 
@@ -70,7 +72,48 @@ final class ColorWheelView: UIView {
         setup()
     }
 
+    override func layoutSublayers(of layer: CALayer) {
+        super.layoutSublayers(of: layer)
+        let centerX = getCenterX(frame: frame)
+        let frame = CGRect(
+            x: centerX,
+            y: 0,
+            width: width,
+            height: width
+        )
+        print(frame)
+        updateColorWheelLayer(frame: frame)
+        updateBrightnessLayer(frame: frame)
+        updateIndicatorBasedOnOrientation()
+    }
+
     // MARK: - Helpers
+
+    func updateIndicatorBasedOnOrientation() {
+        var hue: CGFloat = 0.0
+        var saturation: CGFloat = 0.0
+        var brightness: CGFloat = 0.0
+        var alpha: CGFloat = 0.0
+
+        let isSuccess: Bool = color.getHue(
+            &hue,
+            saturation: &saturation,
+            brightness: &brightness,
+            alpha: &alpha
+        )
+
+        guard isSuccess else {
+            print("Error happened under \(#function) at line \(#line) in \(#fileID) file.")
+            return
+        }
+
+        point = pointAtHueSaturation(hue, saturation: saturation)
+        drawIndicator()
+    }
+
+    func updateFrame(with width: CGFloat) {
+        self.width = width
+    }
 
     func setViewColor(_ color: UIColor!) {
         // Update the entire view with a given color
@@ -141,27 +184,25 @@ final class ColorWheelView: UIView {
 
     private func setup() {
         // Layer for the Hue/Saturation wheel
-        let (width, height) = (frame.width, frame.height)
-        let whiteLayerFrame = CGRect(
-            x: 0,
+
+        width = frame.width
+
+        let centerX = getCenterX(frame: frame)
+
+        let frame = CGRect(
+            x: centerX,
             y: 0,
             width: width,
-            height: height
+            height: width
         )
-        wheelLayer = CALayer()
-        wheelLayer.frame = whiteLayerFrame
-        wheelLayer.contents = createColorWheel(wheelLayer.frame.size)
-        layer.addSublayer(wheelLayer)
+        colorWheelLayer = CALayer()
+        updateColorWheelLayer(frame: frame)
+
+        layer.addSublayer(colorWheelLayer)
 
         // Layer for the brightness
         brightnessLayer = CALayer()
-        brightnessLayer.frame = CGRect(
-            x: 0,
-            y: 0,
-            width: width,
-            height: height
-        )
-        brightnessLayer.cornerRadius = height / 2
+        updateBrightnessLayer(frame: frame)
 
         layer.addSublayer(brightnessLayer)
 
@@ -184,6 +225,23 @@ final class ColorWheelView: UIView {
         let panGestureRecognizer = UIPanGestureRecognizer()
         panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(_:)))
         addGestureRecognizer(panGestureRecognizer)
+    }
+
+    private func getCenterX(frame: CGRect) -> CGFloat {
+        let (width, height) = (frame.width, frame.height)
+        let colorWheelSize = min(width, height)
+        let centerX = (width - colorWheelSize) / 2.0
+        return centerX
+    }
+
+    private func updateColorWheelLayer(frame: CGRect) {
+        colorWheelLayer.frame = frame
+        colorWheelLayer.contents = createColorWheel(colorWheelLayer.frame.size)
+    }
+
+    private func updateBrightnessLayer(frame: CGRect) {
+        brightnessLayer.frame = frame
+        brightnessLayer.cornerRadius = width / 2
     }
 
     // MARK: - Selectors
@@ -271,23 +329,23 @@ private extension ColorWheelView {
     func getIndicatorCoordinate(_ coordinate: CGPoint) -> CGPoint {
         // Making sure that the indicator can't get outside the Hue and Saturation wheel
 
-        let dimension = min(wheelLayer.frame.width, wheelLayer.frame.height)
+        let dimension = min(colorWheelLayer.bounds.width, colorWheelLayer.bounds.height)
         let radius = dimension / 2
-        let wheelLayerCenter = CGPoint(
-            x: wheelLayer.frame.origin.x + radius,
-            y: wheelLayer.frame.origin.y + radius
+        let colorWheelLayerCenter = CGPoint(
+            x: colorWheelLayer.frame.origin.x + radius,
+            y: colorWheelLayer.frame.origin.y + radius
         )
 
-        let dx = coordinate.x - wheelLayerCenter.x
-        let dy = coordinate.y - wheelLayerCenter.y
+        let dx = coordinate.x - colorWheelLayerCenter.x
+        let dy = coordinate.y - colorWheelLayerCenter.y
         let distance = sqrt((dx * dx) + (dy * dy))
         var outputCoordinate = coordinate
 
         // If the touch coordinate is outside the radius of the wheel, transform it to the edge of the wheel with polar coordinates
         if (distance > radius) {
             let theta = atan2(dy, dx)
-            outputCoordinate.x = (radius * cos(theta)) + wheelLayerCenter.x
-            outputCoordinate.y = (radius * sin(theta)) + wheelLayerCenter.y
+            outputCoordinate.x = (radius * cos(theta)) + colorWheelLayerCenter.x
+            outputCoordinate.y = (radius * sin(theta)) + colorWheelLayerCenter.y
         }
 
         return outputCoordinate
@@ -358,7 +416,7 @@ private extension ColorWheelView {
     func hueSaturationAtPoint(_ position: CGPoint) -> (hue: CGFloat, saturation: CGFloat) {
         // Get hue and saturation for a given point (x,y) in the wheel
 
-        let c = wheelLayer.frame.width * scale / 2
+        let c = colorWheelLayer.frame.width * scale / 2
         let dx = (position.x - c) / c
         let dy = (position.y - c) / c
         let d = sqrt( (dx * dx + dy * dy))
@@ -381,7 +439,7 @@ private extension ColorWheelView {
     func pointAtHueSaturation(_ hue: CGFloat, saturation: CGFloat) -> CGPoint {
         // Get a point (x,y) in the wheel for a given hue and saturation
 
-        let dimension = min(wheelLayer.frame.width, wheelLayer.frame.height)
+        let dimension = min(colorWheelLayer.frame.width, colorWheelLayer.frame.height)
         let radius = saturation * dimension / 2
         let x = dimension / 2 + radius * cos(hue * CGFloat((Double.pi) * 2))
         let y = dimension / 2 + radius * sin(hue * CGFloat((Double.pi) * 2))
