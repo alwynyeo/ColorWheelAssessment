@@ -81,7 +81,6 @@ final class ColorWheelView: UIView {
             width: width,
             height: width
         )
-        print(frame)
         updateColorWheelLayer(frame: frame)
         updateBrightnessLayer(frame: frame)
         updateIndicatorBasedOnOrientation()
