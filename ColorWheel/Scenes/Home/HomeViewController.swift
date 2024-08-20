@@ -248,7 +248,7 @@ private extension HomeViewController {
         scrollView.addSubview(scrollContentView)
 
         let heightAnchor = scrollContentView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
-        heightAnchor.priority = UILayoutPriority.defaultLow
+        heightAnchor.priority = UILayoutPriority.fittingSizeLevel
 
         let constraints = [
             scrollContentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
